@@ -1,3 +1,4 @@
 venv/*
 chroma_langchain_db/*
 data/*
+tmp/*
