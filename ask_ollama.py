@@ -46,11 +46,12 @@ def main():
     prompt = prompt_template.format(context=context_text, question=query_text)
     print(prompt)
     
-    model = ChatOllama(base_url="http://15.207.88.163:11434",model="dolphin-mistral:latest")
+    model = ChatOllama(base_url="http://43.204.218.207:11434",model="dolphin-mistral:latest")
     response_text = model.invoke(prompt)
 
     sources = [doc.metadata.get("source", None) for doc, _score in results]
-    formatted_response = f"Response: {response_text}\nSources: {sources}"
+    # formatted_response = f"Response: {response_text}\nSources: {sources}"
+    formatted_response = f"Response: {response_text.content}"
     print(formatted_response)
 
 
