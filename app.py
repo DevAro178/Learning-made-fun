@@ -1,17 +1,29 @@
 from flask import Flask,render_template,request,redirect,url_for,jsonify
-import os,time
+import os,time,dotenv,shutil
 from flask_cors import CORS
 from chatpdf.ask_ollama import main as ask_ollama
 from chatpdf.create_db import main as create_db
+dotenv.load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
 
-UPLOAD_FOLDER = 'static/tmp/'
+UPLOAD_FOLDER = os.getenv("UPLOAD_FOLDER")
 ALLOWED_EXTENSIONS = {'pdf'}
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def clean_directory(directory):
+    for filename in os.listdir(directory):
+        file_path = os.path.join(directory, filename)
+        try:
+            if os.path.isfile(file_path) or os.path.islink(file_path):
+                os.unlink(file_path)
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
+        except Exception as e:
+            print(f'Failed to delete {file_path}. Reason: {e}')
 
 
 @app.route("/")
@@ -32,6 +44,9 @@ def chat():
         # Check if the upload directory exists, if not, create it
         if not os.path.exists(UPLOAD_FOLDER):
             os.makedirs(UPLOAD_FOLDER)
+        else:
+            # Clean the directory
+            clean_directory(UPLOAD_FOLDER)
         
         # Add timestamp to the file name to ensure uniqueness
         timestamp = int(time.time())
