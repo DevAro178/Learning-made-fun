@@ -358,3 +358,31 @@ span.material-symbols-rounded {
   cursor: pointer;
   width: 100%;
 }
+
+.loader {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: block;
+    margin:15px auto;
+    position: relative;
+    background: var(--placeholder-color);
+    box-shadow: -24px 0 var(--placeholder-color), 24px 0 var(--placeholder-color);
+    box-sizing: border-box;
+    animation: shadowPulse 2s linear infinite;
+  }
+  
+  @keyframes shadowPulse {
+    33% {
+      background: var(--placeholder-color);
+      box-shadow: -24px 0 var(--incoming-chat-bg), 24px 0 var(--placeholder-color);
+    }
+    66% {
+      background: var(--incoming-chat-bg);
+      box-shadow: -24px 0 var(--placeholder-color), 24px 0 var(--placeholder-color);
+    }
+    100% {
+      background: var(--placeholder-color);
+      box-shadow: -24px 0 var(--placeholder-color), 24px 0 var(--incoming-chat-bg);
+    }
+  }

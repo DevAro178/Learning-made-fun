@@ -7,9 +7,29 @@
         <title>ChatGPT Clone in JavaScript | CodingNepal</title>
         <link rel="stylesheet" href="{{url_for('static',filename='style.css')}}">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <!-- Google Fonts Link For Icons -->
         <link rel="stylesheet"
             href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+        {% if file_path %}
+        <script>
+            localStorage.removeItem("all-chats");
+            let html = `
+            <div class="chat incoming"><div class="chat-content">
+                    <div class="chat-details">
+                        <img src="/static/assets/ollama.png" alt="chatbot-img">
+                    <p>✅ PDF Ready! Begin Your Chat 🗨️</p></div>
+                    <span onclick="copyResponse(this)" class="material-symbols-rounded">content_copy</span>
+                </div></div>
+                `;
+            localStorage.setItem("all-chats", html);
+            console.log("File path: {{ file_path }}");
+        </script>
+        {% else %}
+        <script>
+            if (!localStorage.getItem('all-chats')) {
+                window.location.href = "/";
+            }
+        </script>
+        {% endif %}
         <script src="{{url_for('static',filename='script.js')}}" defer></script>
     </head>
 

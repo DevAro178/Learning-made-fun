@@ -1,7 +1,8 @@
 from flask import Flask,render_template,request,redirect,url_for,jsonify
 import os,time
 from flask_cors import CORS
-
+from chatpdf.ask_ollama import main as ask_ollama
+from chatpdf.create_db import main as create_db
 
 app = Flask(__name__)
 CORS(app)
@@ -16,7 +17,6 @@ def allowed_file(filename):
 @app.route("/")
 def index():
     return render_template('index.html')
-
 
 @app.route("/chat", methods=['POST', 'GET'])
 def chat():
@@ -38,10 +38,12 @@ def chat():
         filename = f"{timestamp}_{file.filename}"
         file_path = os.path.join(UPLOAD_FOLDER, filename)
         file.save(file_path)
-        
+        db_response=create_db(f'{file_path}')
+        if db_response is False:
+            return redirect(url_for('index'))
         return render_template('chat.html', file_path=filename)
     else:
-        return redirect(url_for('index'))
+        return render_template('chat.html')
 
 @app.route("/api/chat", methods=['POST'])
 def pdfchat():
@@ -50,7 +52,8 @@ def pdfchat():
         data = request.get_json()
         if 'prompt' in data:
             prompt = data['prompt']
-            return jsonify({"text": prompt}), 200
+            response = ask_ollama(prompt)
+            return jsonify({"text": response}), 200
         else:
             return jsonify({"error": "Missing 'prompt' in request body"}), 400
     else:

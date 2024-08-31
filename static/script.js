@@ -19,9 +19,8 @@ const loadDataFromLocalstorage = () => {
     //                     </div>`
 
     const defaultText = `<div class="default-text">
-                            <h1>ChatPDF</h1>
-        <p>PDF Upload Done<br>amet consectetur adipisicing elit. In, eum pariatur totam cumque dolores
-          doloremque sequi reprehenderit <br>Start Chatting </p>
+    <h2>Your upload was a success.</h2>
+        <p>What are you waiting for type away 😊</p>
                         </div>`
 
     chatContainer.innerHTML = localStorage.getItem("all-chats") || defaultText;
@@ -51,20 +50,20 @@ const getChatResponse = async (incomingChatDiv) => {
         })
     };
     
-    fetch(API_URL, requestOptions)
-    .then(response => response.json())
-    .then(data => {
-        if(data.text)
-            pElement.textContent = data.text.trim()
-        else{
+    try {
+        const response = await fetch(API_URL, requestOptions);
+        const data = await response.json();
+        
+        if (data.text) {
+            pElement.textContent = data.text.trim();
+        } else {
             pElement.classList.add("error");
             pElement.textContent = data.error.trim();
         }
-    })
-    .catch(error => {
+    } catch (error) {
         pElement.classList.add("error");
         pElement.textContent = "Oops! Something went wrong while retrieving the response. Please try again.";
-    });
+    }
 
     // Remove the typing animation, append the paragraph element and save the chats to local storage
     incomingChatDiv.querySelector(".typing-animation").remove();
@@ -85,7 +84,7 @@ const showTypingAnimation = () => {
     // Display the typing animation and call the getChatResponse function
     const html = `<div class="chat-content">
                     <div class="chat-details">
-                        <img src="images/chatbot.jpg" alt="chatbot-img">
+                        <img src="/static/assets/ollama.png" alt="chatbot-img">
                         <div class="typing-animation">
                             <div class="typing-dot" style="--delay: 0.2s"></div>
                             <div class="typing-dot" style="--delay: 0.3s"></div>
@@ -111,7 +110,7 @@ const handleOutgoingChat = () => {
 
     const html = `<div class="chat-content">
                     <div class="chat-details">
-                        <img src="images/user.jpg" alt="user-img">
+                        <img src="/static/assets/user.png" alt="user-img">
                         <p>${userText}</p>
                     </div>
                 </div>`;
@@ -128,7 +127,8 @@ deleteButton.addEventListener("click", () => {
     // Remove the chats from local storage and call loadDataFromLocalstorage function
     if(confirm("Are you sure you want to delete all the chats?")) {
         localStorage.removeItem("all-chats");
-        loadDataFromLocalstorage();
+        // loadDataFromLocalstorage();
+        window.location.href = "/";
     }
 });
 
