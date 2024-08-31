@@ -2,6 +2,7 @@ venv/*
 chroma_langchain_db/*
 data/*
 tmp/*
-__pycache__/app.cpython-312.pyc
 static/*
 .env
+*/__pycache__/*
+__pycache__/*
