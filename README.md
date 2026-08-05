@@ -15,7 +15,7 @@ Upload a PDF, get a chat UI grounded in that document via RAG. Built as a coding
 **Steps**
 
 ```bash
-git clone <this-repo>
+git clone https://github.com/usamabuttdev/ChatPDF.git
 cd chat_with_docs
 
 python -m venv .venv
@@ -64,13 +64,13 @@ Browser (templates + static JS)
 
 **Layout**
 
-| Piece | Role |
-|-------|------|
-| `app.py` | HTTP: upload, chat page, JSON chat API |
-| `chatpdf/config.py` | Env + per-doc Chroma path helper |
-| `chatpdf/embeddings.py` | Process-wide embedding singleton |
-| `chatpdf/ingest.py` | PDF → chunks → vector index |
-| `chatpdf/query.py` | Retrieve + prompt + Ollama |
+| Piece                    | Role                                                           |
+| ------------------------ | -------------------------------------------------------------- |
+| `app.py`                 | HTTP: upload, chat page, JSON chat API                         |
+| `chatpdf/config.py`      | Env + per-doc Chroma path helper                               |
+| `chatpdf/embeddings.py`  | Process-wide embedding singleton                               |
+| `chatpdf/ingest.py`      | PDF → chunks → vector index                                    |
+| `chatpdf/query.py`       | Retrieve + prompt + Ollama                                     |
 | `templates/` / `static/` | Upload + chat UI (localStorage holds `doc_id` + rendered chat) |
 
 Each upload gets a `doc_id` (`timestamp_safeName`). Its Chroma store lives under `CHROMA_PATH/<doc_id>/` so documents don’t bleed into each other. Chat requests must send that `doc_id`.
@@ -111,31 +111,31 @@ This repo is a single-process demo. To put it on a hyperscaler I’d treat it as
 
 ### LLM
 
-| Option | Why considered | Why not / why yes |
-|--------|----------------|-------------------|
-| Hosted GPT / Claude | Quality, tools, streaming | Needs API keys, cost; assessment asked for something runnable locally with Ollama |
-| **Ollama (`dolphin-mistral`)** | Local/remote URL, no vendor lock in code, matches the starter brief | Final choice. Quality depends on the box you point `OLLAMA_URL` at |
-| Smaller local models | Faster CPU | Worse instruction following for “answer only from context” |
+| Option                         | Why considered                                                      | Why not / why yes                                                                 |
+| ------------------------------ | ------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| Hosted GPT / Claude            | Quality, tools, streaming                                           | Needs API keys, cost; assessment asked for something runnable locally with Ollama |
+| **Ollama (`dolphin-mistral`)** | Local/remote URL, no vendor lock in code, matches the starter brief | Final choice. Quality depends on the box you point `OLLAMA_URL` at                |
+| Smaller local models           | Faster CPU                                                          | Worse instruction following for “answer only from context”                        |
 
 Chat goes through `langchain-ollama` `ChatOllama`. One call per question — no agent loop.
 
 ### Embeddings
 
-| Option | Notes |
-|--------|--------|
-| OpenAI `text-embedding-3-*` | Strong, paid, network |
+| Option                                              | Notes                                                                         |
+| --------------------------------------------------- | ----------------------------------------------------------------------------- |
+| OpenAI `text-embedding-3-*`                         | Strong, paid, network                                                         |
 | **`BAAI/bge-small-en` via `HuggingFaceEmbeddings`** | Small enough for CPU, solid for English PDF Q&A, offline after first download |
-| Larger BGE / E5 | Better recall, heavier cold start |
+| Larger BGE / E5                                     | Better recall, heavier cold start                                             |
 
 Normalized embeddings (`encode_kwargs.normalize_embeddings=True`) so cosine/relevance scores behave more sanely with Chroma.
 
 ### Vector store
 
-| Option | Notes |
-|--------|--------|
-| FAISS in-memory | Fast, dies with process |
+| Option                            | Notes                                                                 |
+| --------------------------------- | --------------------------------------------------------------------- |
+| FAISS in-memory                   | Fast, dies with process                                               |
 | **Chroma persisted per `doc_id`** | Zero ops for a demo, disk persistence, easy wipe/rebuild on re-ingest |
-| Postgres/pgvector | Better for “real” multi-user later |
+| Postgres/pgvector                 | Better for “real” multi-user later                                    |
 
 Early versions of this idea shared one Chroma path and wiped it on every upload. That’s fine for a single-session toy; wrong if two uploads or a refresh should still work. Per-doc directories fixed that.
 
@@ -198,7 +198,7 @@ I wouldn’t pretend those skips are “fine forever” — they’re timebox ch
 
 Used Cursor as a pair programmer: scaffolding Flask routes, LangChain import churn (`langchain_community` → `langchain_huggingface` / `langchain_chroma`), and “why is this Chroma path wrong” debugging. I treated suggestions as drafts — especially around RAG prompts and threshold defaults — and verified behavior against real PDFs and a live Ollama endpoint.
 
-What I didn’t do: paste an entire generated app and ship it. The interesting bits (per-doc stores, score gate, what *not* to build) came from running the thing and deciding what failed in practice.
+What I didn’t do: paste an entire generated app and ship it. The interesting bits (per-doc stores, score gate, what _not_ to build) came from running the thing and deciding what failed in practice.
 
 ---
 
