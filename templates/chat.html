@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+
+<html lang="en" dir="ltr">
+
+    <head>
+        <meta charset="utf-8">
+        <title>📘Chat with PDF</title>
+        <link rel="stylesheet" href="{{url_for('static',filename='style.css')}}">
+        <link rel="icon" href="{{ url_for('static', filename='assets/ollama.png') }}">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+        {% if doc_id %}
+        <script>
+            localStorage.removeItem("all-chats");
+            localStorage.setItem("doc_id", {{ doc_id | tojson }});
+            let html = `
+            <div class="chat incoming"><div class="chat-content">
+                    <div class="chat-details">
+                        <img src="/static/assets/ollama.png" alt="chatbot-img">
+                    <p>✅ PDF Ready! Begin Your Chat 🗨️</p></div>
+                    <span onclick="copyResponse(this)" class="material-symbols-rounded">content_copy</span>
+                </div></div>
+                `;
+            localStorage.setItem("all-chats", html);
+        </script>
+        {% else %}
+        <script>
+            if (!localStorage.getItem('all-chats') || !localStorage.getItem('doc_id')) {
+                window.location.href = "/";
+            }
+        </script>
+        {% endif %}
+        <script src="{{url_for('static',filename='script.js')}}" defer></script>
+    </head>
+
+    <body>
+        <!-- Chats container -->
+        <div class="chat-container"></div>
+
+        <!-- Typing container -->
+        <div class="typing-container">
+            <div class="typing-content">
+                <div class="typing-textarea">
+                    <textarea id="chat-input" spellcheck="false" placeholder="Enter a prompt here" required></textarea>
+                    <span id="send-btn" class="material-symbols-rounded">send</span>
+                </div>
+                <div class="typing-controls">
+                    <span id="theme-btn" class="material-symbols-rounded">light_mode</span>
+                    <span id="delete-btn" class="material-symbols-rounded">delete</span>
+                </div>
+            </div>
+
+    </body>
+
+</html>
